@@ -3,19 +3,31 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [todos, setTodos] = useState([
-    {text: "Next", completed: false },
-    {text: "poster", completed:false },
-  ]);
+  const [todos, setTodos] = useState([]);
   const [newTodo,setNewTodo]= useState("")
 
   const handleAdd =()=>{
     if(newTodo.trim()==="") return;
 
     const newTask = {text: newTodo,completed: false};
-    setTodos([...todos,newTask])
+    setTodos([newTask,...todos])
     setNewTodo("");
 
+  };
+
+  const handleDelete = (index) =>{
+      const updatedTodos = todos.filter((_,i)=> i!=index )
+      setTodos(updatedTodos);
+  };
+
+  const handleToggle = (index) =>{
+    const updated =todos.map((todo,i)=>{
+      if(i===index){
+        return {...todo , completed : !todo.completed};
+      }
+      return todo;
+    });
+    setTodos(updated);
   };
   
 
@@ -34,11 +46,14 @@ return (
       <input 
       type='text'
       placeholder='Add your todo'
+      value={newTodo}
+      onChange={(e) => setNewTodo(e.target.value) }
       className='flex-1 bg-gray-200 rounded-2xl p-3'
       />
 
 
       <button 
+      onClick={handleAdd}
       className='bg-orange-500 text-white rounded-2xl p-3 px-5 cursor-pointer whitespace-nowrap'
       >
       Add</button>
@@ -51,7 +66,10 @@ return (
         <li key={index} className='flex justify-between items-center bg-gray-100 px-3 py-1 rounded-xl'> 
         <div className='flex items-center gap-1.5 min-w-0'>
           <input
+          
           type='checkbox'
+          checked={todo.completed}
+          onChange={()=>handleToggle(index)}
           className='cursor-pointer w-4 h-4 flex-shrink-0'
           >
           </input>
@@ -64,6 +82,7 @@ return (
           className='cursor-pointer text-xl'>✏️
           </button>
           <button 
+          onClick={()=>handleDelete(index)}
           className='text-red-500 hover:text-red-700 justify-end font-bold sm:text-2xl lg:text-2xl cursor-pointer'
           >
           X</button>
