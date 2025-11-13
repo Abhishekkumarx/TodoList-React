@@ -3,7 +3,10 @@ import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState(() => {
+    const stored = localStorage.getItem("todos");
+    return stored ? JSON.parse(stored) : [];
+  });
   const [newTodo,setNewTodo]= useState("");
   const [editingIndex, setEditingIndex] = useState(null);
   const [editedText, setEditedText] = useState('');
@@ -17,6 +20,7 @@ function App() {
       setTodos(JSON.parse(storedTodos));
     }
   },[]);
+
 
   //save to local storage
   useEffect(()=>{
@@ -33,11 +37,30 @@ function App() {
     setNewTodo("");
     
   };
+
+  const enterBtn =(e)=>{
+    if(e.key === 'Enter')
+    {
+      handleAdd();
+    }
+  };
+
+  const enterForSave = (e,index) => {
+      if(e.key === 'Enter')
+      {
+        e.preventDefault()
+        handleSave(index);
+      }
+  };
   
   const handleDelete = (index) =>{
     const updatedTodos = todos.filter((_,i)=> i!=index )
     setTodos(updatedTodos);
   };
+
+  // const handleDelete = (index) => {
+  //     setTodos(todos.filter(todo => todo.index !== index));
+  //   }
   
   const handleToggle = (index) =>{
     const updated =todos.map((todo,i)=>{
@@ -88,6 +111,7 @@ function App() {
       placeholder='Add your todo'
       value={newTodo}
       onChange={(e) => setNewTodo(e.target.value) }
+      onKeyDown={enterBtn}
       className='flex-1 bg-gray-200 rounded-2xl p-3'
       />
 
@@ -117,7 +141,9 @@ function App() {
   <input
     type="text"
     value={editedText}
+    
     onChange={(e) => setEditedText(e.target.value)}
+    onKeyDown={(e)=>enterForSave(e,index)}
     className="flex-1 bg-gray-200 rounded-xl p-1"
   />
 ) : (
